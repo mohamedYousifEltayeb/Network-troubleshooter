@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <title>Device Inventory</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="head">
+        <h1>Device Inventory</h1>
+    </div>
+
+    <div class="table">
+
+        <table>
+
+            <tr>
+                <th>Hostname</th>
+                <th>Vendor</th>
+                <th>Management IP</th>
+                <th>Device Type</th>
+                <th>Location</th>
+				<th> Action</th>
+            </tr>
+
+            {% if not devices %}
+
+            <tr>
+                <td colspan="5">No devices have been added yet.</td>
+            </tr>
+
+            {% else %}
+
+                {% for device in devices %}
+
+                <tr>
+                    <td>{{ device.hostname }}</td>
+                    <td>{{ device.vendor }}</td>
+                    <td>{{ device.management_ip }}</td>
+                    <td>{{ device.device_type }}</td>
+                    <td>{{ device.location }}</td>
+					<td>
+					<form action ="/devices/{{device.id}}/delete" method ="post">
+					<button type = "submit"> Delete </button></form>
+					</td>
+                </tr>
+
+                {% endfor %}
+
+            {% endif %}
+
+        </table>
+
+    </div>
+
+    <div class="adding_device">
+        <a href="/devices/add">Add Device</a>
+    </div>
+
+
+</body>
+</html>
+```

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Network Troubleshooter</title>
+		<link rel="stylesheet" href="static\style.css">
+    </head>
+
+    <body>
+        <div class="head"><h1>Network Troubleshooter</h1></div>
+
+        <form action="/analyze" method = "POST">
+            <textarea
+                name="logs"
+                rows="12"
+                col="80"
+                placeholder="Paste router logs here..."
+            >
+            </textarea>
+            <br></br>
+            <button type="submit"> Analyze </button>
+        </form>
+        <h2>Analysis Result</h2>
+        <div class="result">
+            {{result}}
+        </div>
+    </body>
+</html>

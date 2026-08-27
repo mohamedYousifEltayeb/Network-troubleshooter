@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Device Format</title>
+		<link rel="stylesheet" href="/static/style.css">
+    </head>
+
+    <body>
+        <div class="head"><h1>Device Format</h1></div>
+
+       <div> <form action="/devices" method = "POST">
+            <label for="hostname">Hostname</label>: <input id = "hostname" name = "hostname" type = "text" placeholder="Enter hostname here...."></input>
+			<br></br>
+			<label for="management_ip"> Management IP</label>: <input id="management_ip" name ="management_ip" type = "text" placeholder="Enter ip here...."></input>
+			<br></br>
+			<label for="model">Model</label>: <input id = "model"name = "model"  type = "text" placeholder="Enter model here...."></input>
+			<br></br>
+			<label for="vendor">Vendor</label>: 
+  <select id="vendor" name="vendor">
+    <option value="cisco">Cisco</option>
+    <option value="Juniper">Juniper</option>
+    <option value="Huawei">Huawei</option>
+  </select>
+  <br></br>
+  <label for ="device_type">Device Type</label>: 
+  <select id="device_type" name="device_type">
+    <option value="router">Router</option>
+    <option value="switch">Switch</option>
+    <option value="Firewall">Firewall</option>
+  </select>
+  <br></br>
+  <label for = "location"> Location</label>: <input id = "label" name = "location" type = "text" placeholder="Enter location here...."></input>
+		<br></br>
+		<button type="submit"> Add Device </button>
+		</form>
+		</div>
+
+    </body>
+</html>
