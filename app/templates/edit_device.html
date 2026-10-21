@@ -12,6 +12,13 @@
     </div>
 
     <div>
+        {% if errors %}
+        <ul class="error-list">
+            {% for message in errors %}
+            <li> {{message}}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         <form action="/devices/{{ device.id }}/edit" method="POST">
 
             <label for="hostname">Hostname</label>
@@ -29,7 +36,7 @@
                 id="management_ip"
                 name="management_ip"
                 type="text"
-                value="{{ device.management_ip }}"
+                value="{{ submitted_management_ip if submitted_management_ip is defined else device.management_ip }}"
             >
 
             <br><br>

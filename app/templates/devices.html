@@ -27,7 +27,7 @@
             {% if not devices %}
 
             <tr>
-                <td colspan="5">No devices have been added yet.</td>
+                <td colspan="6">No devices have been added yet.</td>
             </tr>
 
             {% else %}
@@ -35,16 +35,20 @@
                 {% for device in devices %}
 
                 <tr>
-                    <td>{{ device.hostname }}</td>
+                    <td><a href="/devices/{{ device.id}}">{{ device.hostname }}</a></td>
                     <td>{{ device.vendor }}</td>
                     <td>{{ device.management_ip }}</td>
                     <td>{{ device.device_type }}</td>
                     <td>{{ device.location }}</td>
-					<td>
-					<form action ="/devices/{{device.id}}/delete" method ="post">
-					<button type = "submit"> Delete </button></form>
-					</td>
-                </tr>
+                    <td>
+                     <a href="/devices/{{ device.id}}/edit">Edit</a>
+                     <form
+                         action = "/devices/{{device.id}}/delete"
+                         method="post"
+                         style="display:inline;">
+                             <button type="submit">Delete</button>
+                         </form>
+                     </td>                </tr>
 
                 {% endfor %}
 

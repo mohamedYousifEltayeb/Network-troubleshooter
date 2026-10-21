@@ -1,7 +1,7 @@
-def get_base_context():
+def get_base_context(devices = None):
 
     return {
         "username": "Alice",
         "companyname": "Canar Telecom",
-        "devices":devices,
+        "devices":devices or [],
     }
