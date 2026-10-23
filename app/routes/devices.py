@@ -245,7 +245,7 @@ def edit_device(
 
     return RedirectResponse(url="/devices", status_code=303)
 
-@router.get("/devices/{device.id}")
+@router.get("/devices/{device_id}")
 def devices_details(
     device_id:int,
     request: Request,

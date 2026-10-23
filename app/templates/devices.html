@@ -21,7 +21,8 @@
                 <th>Management IP</th>
                 <th>Device Type</th>
                 <th>Location</th>
-				<th> Action</th>
+				<th>Action</th>
+				<th>Status </th>
             </tr>
 
             {% if not devices %}
@@ -48,7 +49,9 @@
                          style="display:inline;">
                              <button type="submit">Delete</button>
                          </form>
-                     </td>                </tr>
+                     </td>
+                    <td> {{device.status}}</td>
+                </tr>
 
                 {% endfor %}
 

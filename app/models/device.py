@@ -9,3 +9,4 @@ class Device(SQLModel, table=True):
     model: str
     device_type: str
     location: str
+    status: str = Field( default ="Unknown", index = True)
