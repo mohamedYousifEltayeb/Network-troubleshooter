@@ -2,7 +2,7 @@
 <html>
     <head>
         <title> Device Details</title>
-        < link rel = "stylesheet" href="/static/style.css">
+        < link rel ="stylesheet" href="/static/style.css">
     </head>
     <body>
         <div class="head">
@@ -37,6 +37,10 @@
                 <tr>
                     <td> Location </td>
                     <td> {{device.location}}</td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td> {{ device.status }}</td>
                 </tr>
             </table>
         </div>
