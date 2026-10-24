@@ -10,6 +10,7 @@ from app.services.device_service import (create_device,
     delete_device,
     update_device,
     get_device_by_ip)
+from app.services.connectivity_service import ping_device
 from pydantic import ValidationError
 from app.schemas.device import DeviceCreate
 from sqlalchemy.exc import IntegrityError
@@ -249,6 +250,7 @@ def edit_device(
 def devices_details(
     device_id:int,
     request: Request,
+    ping: str | None = None,
     session: Session = Depends(get_session)
 ):
     statement = select(Device).where(Device.id == device_id)
@@ -259,5 +261,29 @@ def devices_details(
     return templates.TemplateResponse(
         request = request,
         name="device_details.html",
-        context={"device":device}
+        context={"device":device,
+            "ping": ping
+        }
+    )
+@router.post("/devices/{device_id}/ping")
+def ping_device_route(
+    device_id : int,
+    session: Session = Depends(get_session)
+):
+    statement = select(Device).where(Device.id == device_id)
+    device = session.exec(statement).first()
+
+    if device is None:
+        raise HTTPException(status_code=404, detail= "Device not found")
+    is_reachable = ping_device(device.management_ip)
+
+    device.status = "Reachable" if is_reachable else "Unreachable"
+
+    session.add(device)
+    session.commit()
+    session.refresh(device)
+
+    return RedirectResponse(
+        url=f"/devices/{device_id}?ping={'success' if is_reachable else 'failed'}",
+        status_code=303
     )

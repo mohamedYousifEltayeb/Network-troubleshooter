@@ -18,6 +18,10 @@ def ping_device(ip_address: str) -> bool:
             text = True,
             timeout=4
         )
+        print("Ping command:", command)
+        print("Return code:", result.returncode)
+        print("Ping output:", result.stdout)
+        print("Ping errors:", result.stderr)
         return result.returncode == 0
     except(subprocess.TimeoutExpired, FileNotFoundError):
         return False
