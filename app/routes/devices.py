@@ -5,6 +5,7 @@ from sqlmodel import Session, select
 from app.core.templates import templates
 from app.database import get_session
 from app.models.device import Device
+from app.models.ping_history import PingHistory
 from app.services.device_service import (create_device,
     get_all_devices,
     delete_device,
@@ -275,7 +276,14 @@ def ping_device_route(
 
     if device is None:
         raise HTTPException(status_code=404, detail= "Device not found")
-    is_reachable = ping_device(device.management_ip)
+    is_reachable,response_time_ms  = ping_device(device.management_ip)
+    record = PingHistory(
+        device_id = device.id,
+        ip_address = device.management_ip,
+        result = "Success" if is_reachable else "Failed",
+        response_time_ms= response_time_ms
+    )
+    session.add(record)
 
     device.status = "Reachable" if is_reachable else "Unreachable"
 

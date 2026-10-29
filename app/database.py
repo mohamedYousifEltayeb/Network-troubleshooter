@@ -1,3 +1,4 @@
+from app.models.ping_history import PingHistory
 from sqlmodel import SQLModel, create_engine
 from sqlmodel import Session
 

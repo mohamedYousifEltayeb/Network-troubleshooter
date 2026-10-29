@@ -2,7 +2,7 @@
 <html>
     <head>
         <title> Device Details</title>
-        <link rel ="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/style.css">
     </head>
     <body>
         <div>
@@ -10,11 +10,11 @@
             <h1>Device details</h1>
         </div>
         {% if ping == "success" %}
-            <p class="ping-success">
+            <p class="success">
                 Ping Successful! The device responded to ICMP.
             </p>
         {% elif ping == "failed" %}
-              <p class="ping-failed">
+              <p class="failed">
                   Ping failed. The device did not respond to ICMP.
               </p>
         {% endif %}
