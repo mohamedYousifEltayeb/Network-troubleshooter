@@ -54,10 +54,107 @@
                 </tr>
             </table>
         </div>
+        <h2> Ping History</h2>
+        {% if ping_history %}
+        <div class="table">
+            <table>
+                <tr>
+                    <th>Timestamp (UTC)</th>
+                    <th>IP Address</th>
+                    <th>Result</th>
+                    <th> Response Time (ms)</th>
+
+                </tr>
+                {% for record in ping_history %}
+                  <tr>
+                      <td> {{record.timestamp}}</td>
+                      <td>{{record.ip_address}}</td>
+                      <td>{{record.result}}</td>
+                      <td>
+                          {% if record.response_time_ms is not none %}
+                              {{record.response_time_ms}}
+                          {% else %}
+                              N/A
+                          {% endif %}
+                      </td>
+                  </tr>
+                  {% endfor %}
+            </table>
+        </div>
+        {% else %}
+           <p> No ping history recorded yet.</p>
+
+        {% endif %}
+        <h2> Ping Statistics</h2>
+        <div class="stats-container">
+            <p>Total Pings: {{ total_pings}}</p>
+            <p>Successful Pings: {{successful_pings}}</p>
+            <p>Failed Pings: {{failed_pings}}</p>
+            <p>Packet Loss: {{ "%.2f"|format(packet_loss)}}%</p>
+            <p>Average Response Time:
+               {{ average_time if average_time is not none else "N/A"}}
+            </p>
+            <p>Minimum Response Time:
+               {{ minimum_time if minimum_time is not none else "N/A"}}
+            </p>
+            <p>Maximum Response Time:
+                {{ maximum_time if maximum_time is not none else "N/A"}}
+            </p>
+        </div>
         <p> <a href="/devices"> Back to Device Inventory </a></p>
         <p><a href="/devices/{{ device.id }}/edit"> Edit Device </a></p>
         <form action ="/devices/{{device.id}}/ping" method ="post">
             <button type="submit">Ping Device</button>
         </form>
+        <form action="/devices/{{ device.id }}/ping-session" method="post">
+            <button type="submit">Run 10-Ping Session</button>
+        </form>
+        <h2>Latency History</h2>
+        <div class="chart-container">
+            <canvas id="latencyChart"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const chartLabels = {{ chart_labels | tojson}};
+            const chartData = {{ chart_data | tojson}};
+
+            const ctx = document.getElementById("latencyChart");
+
+            new Chart(ctx, {
+              type:"line",
+              data: {
+                labels: chartLabels,
+                datasets:[{
+                  label:"Response Time(ms)",
+                  data : chartData,
+                  borderColor: "#3498db",
+                  backgroundColor:"rgb(52, 152,219,0.15)",
+                  borderWidth: 2,
+                  tension:0.3,
+                  spanGaps: false
+                }]
+              },
+              options:{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales:{
+                  y:{
+                    beginAtZero: true,
+                    title:{
+                      display: true,
+                      text: "Latency (ms)"
+                    }
+                  },
+                  x: {
+                    title:{
+                      display: true,
+                      text: "Ping Time"
+                    }
+
+                  }
+                }
+              }
+            });
+        </script>
     </body>
 </html>

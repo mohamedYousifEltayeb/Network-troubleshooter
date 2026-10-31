@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 class PingHistory( SQLModel, table = True):
     id: int | None = Field(default = None , primary_key = True)
-
+    session_id:str | None = Field(default = None , index = True)
 
     device_id: int = Field( foreign_key = "device.id", index = True)
     ip_address: str

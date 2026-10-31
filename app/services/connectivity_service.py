@@ -36,3 +36,15 @@ def ping_device(ip_address: str) -> tuple[bool, float | None]:
         return is_reachable, response_time_ms
     except(subprocess.TimeoutExpired, FileNotFoundError):
         return False, None
+
+def run_ping_session(ip_address: str, count: int = 10):
+    results= []
+
+    for _ in range(count):
+        is_reachable, response_time_ms= ping_device(ip_address)
+        results.append({
+            "result":"Success" if is_reachable else "Failed",
+            "response_time_ms": response_time_ms
+        })
+
+    return results

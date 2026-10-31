@@ -24,3 +24,9 @@ p {
     padding: 10px;
     border-radius: 5px;
 }
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    margin-bottom: 30px;
+}

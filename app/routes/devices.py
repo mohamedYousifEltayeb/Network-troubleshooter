@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlmodel import Session, select
@@ -11,7 +12,7 @@ from app.services.device_service import (create_device,
     delete_device,
     update_device,
     get_device_by_ip)
-from app.services.connectivity_service import ping_device
+from app.services.connectivity_service import (ping_device,run_ping_session)
 from pydantic import ValidationError
 from app.schemas.device import DeviceCreate
 from sqlalchemy.exc import IntegrityError
@@ -259,11 +260,74 @@ def devices_details(
 
     if device is None:
         raise HTTPException(status_code = 404, detail = "Device not found")
+    history_statement = (
+        select(PingHistory)
+        .where(PingHistory.device_id == device_id)
+        .order_by(PingHistory.timestamp.desc())
+    )
+    ping_history = session.exec(history_statement).all()
+
+    latest_session = next(
+        (record for record in ping_history if record.session_id is not None), None
+    )
+    session_history = [
+        record for record in ping_history
+        if latest_session is not None
+        and record.session_id == latest_session.session_id
+    ]
+    chart_labels = [record.timestamp.strftime("%m-%d %H:%M")
+        for record in reversed(ping_history)]
+
+    chart_data = [record.response_time_ms
+        for record in reversed(ping_history)]
+
+    response_times = [
+        record.response_time_ms
+        for record in session_history
+        if record.response_time_ms is not None
+    ]
+
+    total_pings = len(session_history)
+
+    successful_pings = sum(
+        1 for record in session_history
+        if record.result == "Success"
+    )
+
+    failed_pings = sum(
+        1 for record in session_history
+        if record.result == "Failed"
+    )
+
+    packet_loss = (
+        (failed_pings / total_pings) * 100
+        if total_pings > 0 else 0
+    )
+
+    average_time = (
+        sum(response_times) / len(response_times)
+        if response_times else None
+    )
+
+    minimum_time = min(response_times) if response_times else None
+    maximum_time = max(response_times) if response_times else None
     return templates.TemplateResponse(
         request = request,
         name="device_details.html",
         context={"device":device,
-            "ping": ping
+            "ping": ping,
+            "ping_history": ping_history,
+            "total_pings": total_pings,
+            "successful_pings": successful_pings,
+            "failed_pings": failed_pings,
+            "packet_loss": packet_loss,
+            "average_time": average_time,
+            "minimum_time": minimum_time,
+            "maximum_time": maximum_time,
+            "chart_labels": chart_labels,
+            "chart_data": chart_data,
+            "session_history": session_history,
+
         }
     )
 @router.post("/devices/{device_id}/ping")
@@ -295,3 +359,42 @@ def ping_device_route(
         url=f"/devices/{device_id}?ping={'success' if is_reachable else 'failed'}",
         status_code=303
     )
+@router.post("/devices/{device_id}/ping-session")
+def ping_session_route(
+device_id: int,
+session: Session = Depends(get_session)
+):
+    statement = select(Device).where(Device.id == device_id)
+    device = session.exec(statement).first()
+
+    if device is None:
+        raise HTTPException(status_code =404, detail= "Device is not found")
+
+
+    results = run_ping_session(device.management_ip, count= 10)
+    session_id = str(uuid.uuid4())
+    for result in results:
+        record = PingHistory(
+            device_id = device.id,
+            ip_address = device.management_ip,
+            result = result["result"],
+            response_time_ms = result["response_time_ms"],
+            session_id = session_id
+        )
+        session.add(record)
+
+    successful_pings = sum(
+        1 for result in results
+        if result["result"] == "Success"
+    )
+    device.status = (
+        "Reachable" if successful_pings > 0 else "Unreachable"
+    )
+
+    session.add(device)
+    session.commit()
+
+    return RedirectResponse(
+            url=f"/devices/{device_id}",
+            status_code=303
+        )
